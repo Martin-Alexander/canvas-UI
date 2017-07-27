@@ -51,6 +51,7 @@ function partOfBoardThatIsRendered() {
 
   if (bottommostRenderedRow > numberOfRows) {
     bottommostRenderedRow = numberOfRows;
+    topmostRenderedRow = numberOfRows - numberOfRenderedRows;
   }
 
   for (var row = 0; row < numberOfRows; row++) {
@@ -102,6 +103,16 @@ $(document).ready(function() {
 
   setNumberOfRenderedColumns();
   setNumberOfRenderedRow();
+
+  window.addEventListener("mouseup", function(event) {
+    var rect = canvas.getBoundingClientRect();
+    mouseCoordinates = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+
+    
+  });
 
   window.setInterval(function() {
     partOfBoardThatIsRendered();
