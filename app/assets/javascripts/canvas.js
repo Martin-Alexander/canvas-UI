@@ -7,12 +7,13 @@ var boardData = [];
 var squareSize = 50;
 var canvasWidth = window.innerWidth * 0.95;
 var canvasHeight = window.innerHeight * 0.95;
-var numberOfColumns;
-var numberOfRows;
-var centerSquare = { row: 50, col: 40 };
+var centerSquare = { row: 0, col: 0 };
 var renderedBoard = [];
 var numberOfRenderedColumns;
 var numberOfRenderedRows;
+
+var canvas;
+var canvasContext;
 
 function setNumberOfRenderedColumns() {
 
@@ -26,10 +27,31 @@ function setNumberOfRenderedRow() {
 
 function partOfBoardThatIsRendered() {
 
-  var leftmostRenderedColumn = centerSquare.col - numberOfRenderedColumns / 2;
-  var rightmostRenderedColumn = centerSquare.col + numberOfRenderedColumns / 2;
-  var topmostRenderedRow = centerSquare.row - numberOfRenderedRows / 2;
-  var bottommostRenderedRow = centerSquare.row + numberOfRenderedRows / 2;
+  renderedBoard = [];
+
+  var leftmostRenderedColumn = centerSquare.col - (numberOfRenderedColumns / 2);
+  var rightmostRenderedColumn = centerSquare.col + (numberOfRenderedColumns / 2);
+  var topmostRenderedRow = centerSquare.row - (numberOfRenderedRows / 2);
+  var bottommostRenderedRow = centerSquare.row + (numberOfRenderedRows / 2);
+  
+  if (leftmostRenderedColumn < 0) {
+    leftmostRenderedColumn = 0;
+    rightmostRenderedColumn = numberOfRenderedColumns;
+  }
+
+  if (rightmostRenderedColumn > numberOfColumns) {
+    rightmostRenderedColumn = numberOfColumns;
+    leftmostRenderedColumn = numberOfColumns - numberOfRenderedColumns;
+  }
+
+  if (topmostRenderedRow < 0) {
+    topmostRenderedRow = 0;
+    bottommostRenderedRow = numberOfRenderedRows;
+  }
+
+  if (bottommostRenderedRow > numberOfRows) {
+    bottommostRenderedRow = numberOfRows;
+  }
 
   for (var row = 0; row < numberOfRows; row++) {
     if (row < bottommostRenderedRow && row > topmostRenderedRow) {
@@ -38,6 +60,26 @@ function partOfBoardThatIsRendered() {
         if (col > leftmostRenderedColumn && col < rightmostRenderedColumn) {
           renderedBoard[renderedBoard.length - 1].push(boardData[row][col]);
         }
+      }
+    }
+  }
+}
+
+function renderBoard() {
+  // This needs to be refined
+  var num_rows = renderedBoard.length;
+  var num_cols = renderedBoard[0].length;
+  for (var row = 0; row < num_rows; row++) {
+    for (var col = 0; col < num_cols; col++) {
+      var square = renderedBoard[row][col];
+      if (square == 1) {
+        canvasContext.fillStyle = "red";
+        canvasContext.fillRect(col * squareSize, row * squareSize, squareSize, squareSize);
+        canvasContext.fill();
+      } else {
+        canvasContext.fillStyle = "blue";
+        canvasContext.fillRect(col * squareSize, row * squareSize, squareSize, squareSize);
+        canvasContext.fill();        
       }
     }
   }
@@ -53,18 +95,16 @@ for (var row = 0; row < numberOfRows; row++) {
 $(document).ready(function() {
   
   $("#main").html("<canvas id=\"canvas\"><canvas>");
-  var canvas = document.getElementById("canvas");
-  var canvasContext = canvas.getContext("2d");
+  canvas = document.getElementById("canvas");
+  canvasContext = canvas.getContext("2d");
   canvasContext.canvas.width = canvasWidth;
   canvasContext.canvas.height = canvasHeight;
 
   setNumberOfRenderedColumns();
   setNumberOfRenderedRow();
-  partOfBoardThatIsRendered();
-
-  console.log(renderedBoard);
 
   window.setInterval(function() {
-
+    partOfBoardThatIsRendered();
+    renderBoard();
   }, 30);
 });
