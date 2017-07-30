@@ -117,9 +117,9 @@ function setRenderedBoard() {
 
   renderedBoard = [];
 
-  for (var row = topRenderedRow; row <= bottomRenderedRow; row++) {
+  for (var row = topRenderedRow; row < bottomRenderedRow; row++) {
     renderedBoard.push([]);
-    for (var col = leftRenderedCol; col <= rightRenderedCol; col++) {
+    for (var col = leftRenderedCol; col < rightRenderedCol; col++) {
       renderedBoard[renderedBoard.length - 1].push(gameBoard[row][col]);
     }
   }
@@ -140,8 +140,6 @@ function initializeMouseEvenListeners() {
     };
 
     var square = renderedBoard[tile.row][tile.col];
-
-    console.log(square);
 
     setRenderFrame(square.col, square.row);
   });
