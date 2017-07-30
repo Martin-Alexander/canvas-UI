@@ -53,17 +53,25 @@ function renderSquare(col, row, square) {
 
 function renderBoard() {
 
-  for (var row = 0; row < numberOfRenderedRows; row++) {
-    for (var col = 0; col < numberOfRenderedColumns; col++) {
-      renderSquare(col, row, gameBoard[row][col]);
+  var renderCol = 0;
+  var renderRow = 0;
+
+  for (var row = topRenderedRow; row < bottomRenderedRow; row++) {
+    for (var col = leftRenderedCol; col < rightRenderedCol; col++) {
+      renderSquare(renderCol, renderRow, gameBoard[row][col]);
+      renderCol++;
     }
+    renderRow++;
+    renderCol = 0;
   }
 }
 
 function setRenderFrame(col, row) {
 
-  topRenderedRow, bottomRenderedRow = row;
-  leftRenderedCol, rightRenderedCol = col;
+  topRenderedRow = row;
+  bottomRenderedRow = row;
+  leftRenderedCol = col;
+  rightRenderedCol = col;
 
   var numberOfRenderedRowsCounter = numberOfRenderedRows - 1;
   var numberOfRenderedColumnsCounter = numberOfRenderedColumns - 1;
@@ -74,15 +82,28 @@ function setRenderFrame(col, row) {
       topRenderedRow--;
       numberOfRenderedRowsCounter--;
     }
-    if (numberOfRowsCounter == 0) { break; }
+    if (numberOfRenderedRowsCounter == 0) { break; }
     if (bottomRenderedRow < numberOfRows) {
       bottomRenderedRow++;
       numberOfRenderedRowsCounter--;
     }
   }
+
+  while (true) {
+    if (numberOfRenderedColumnsCounter == 0) { break; }
+    if (leftRenderedCol > 0) {
+      leftRenderedCol--;
+      numberOfRenderedColumnsCounter--;
+    }
+    if (numberOfRenderedColumnsCounter == 0) { break; }
+    if (rightRenderedCol < numberOfColumns) {
+      rightRenderedCol++;
+      numberOfRenderedColumnsCounter--;
+    }
+  }  
 }
 
-function initializeGameBoard() {
+function initializeRenderedBoard() {
 
   for (var row = topRenderedRow; row <= bottomRenderedRow; row++) {
     gameBoard.push([]);
@@ -92,3 +113,18 @@ function initializeGameBoard() {
     }
   }
 }
+
+$(document).ready(function() {
+  initializeCanvas();
+  initializeGameBoard();
+  setRenderFrame(0, 0);
+  window.setInterval(function() {
+    renderBoard();
+    // console.log(
+    //   "top: " + topRenderedRow +
+    //   "\nbottom: " + bottomRenderedRow +
+    //   "\nleft: " + leftRenderedCol +
+    //   "\nright: " + rightRenderedCol
+    // );
+  }, 30);
+});
