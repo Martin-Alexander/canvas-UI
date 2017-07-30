@@ -1,17 +1,25 @@
-const numberOfColumns = 100;
-const numberOfRows = 80;
+const numberOfColumns = 15;
+const numberOfRows = 15;
 const squareSize = 50;
-const canvasWidth = window.innerWidth * 0.95;
-const canvasHeight = window.innerHeight * 0.95;
-const numberOfRenderedColumns = Math.floor(canvasWidth / squareSize);
-const numberOfRenderedRows = Math.floor(canvasHeight / squareSize);
+const canvasWidth = window.innerWidth * 0.99;
+const canvasHeight = window.innerHeight * 0.99;
+
+if (Math.floor(canvasWidth / squareSize) < numberOfColumns) {
+  var numberOfRenderedColumns = Math.floor(canvasWidth / squareSize);
+} else {
+  var numberOfRenderedColumns = numberOfColumns;
+}
+if (Math.floor(canvasHeight / squareSize) < numberOfRows) {
+  var numberOfRenderedRows = Math.floor(canvasHeight / squareSize);
+} else {
+  var numberOfRenderedRows = numberOfRows;
+}
 
 var gameBoard = [];
 
 var canvas;
 var canvasContext;
 
-var centerSquare = { row: 0, col: 0 };
 var renderedBoard = [];
 var topRenderedRow;
 var bottomRenderedRow;
@@ -101,23 +109,50 @@ function setRenderFrame(col, row) {
       numberOfRenderedColumnsCounter--;
     }
   }  
+
+  setRenderedBoard();
 }
 
-function initializeRenderedBoard() {
+function setRenderedBoard() {
+
+  renderedBoard = [];
 
   for (var row = topRenderedRow; row <= bottomRenderedRow; row++) {
-    gameBoard.push([]);
+    renderedBoard.push([]);
     for (var col = leftRenderedCol; col <= rightRenderedCol; col++) {
-      var value = Math.random() > 0.5 ? 0 : 1;
-      gameBoard[gameBoard.length - 1].push(new Square(col, row, value));
+      renderedBoard[renderedBoard.length - 1].push(gameBoard[row][col]);
     }
   }
+}
+
+function initializeMouseEvenListeners() {
+  window.addEventListener("mouseup", function(event) {
+
+    var rect = canvas.getBoundingClientRect();
+    var mouseCoordinates = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+
+    var tile = {
+      col: Math.floor(mouseCoordinates.x / squareSize),
+      row: Math.floor(mouseCoordinates.y / squareSize)
+    };
+
+    var square = renderedBoard[tile.row][tile.col];
+
+    console.log(square);
+
+    setRenderFrame(square.col, square.row);
+  });
 }
 
 $(document).ready(function() {
   initializeCanvas();
   initializeGameBoard();
   setRenderFrame(0, 0);
+  setRenderedBoard();
+  initializeMouseEvenListeners();
   window.setInterval(function() {
     renderBoard();
     // console.log(
